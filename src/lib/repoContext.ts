@@ -3,12 +3,13 @@ import { MockPantryRepo } from '../repo/MockPantryRepo';
 import type { PantryRepo } from '../repo/PantryRepo';
 
 /**
- * Single shared repo instance for the app's lifetime.
+ * Default context value. Always `MockPantryRepo` — this is what every
+ * consumer gets unless wrapped by `RepoProvider` (see
+ * `src/hooks/RepoProvider.tsx`), which is what `App.tsx` actually renders.
  *
- * Swap-in note: when the Supabase backend lands, branch here on an env
- * var (e.g. `VITE_SUPABASE_URL`) to construct a `SupabasePantryRepo`
- * instead — components consume this context and never reference
- * `MockPantryRepo` directly.
+ * Kept as a lazily-shared singleton so mock mode (the zero-env default dev
+ * experience) is byte-for-byte unchanged: same in-memory state for the
+ * lifetime of the page.
  */
 export const defaultRepo: PantryRepo = new MockPantryRepo();
 

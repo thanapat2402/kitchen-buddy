@@ -9,6 +9,8 @@ export const initialAuthState: AuthState = {
   isMock: !import.meta.env.VITE_LIFF_ID,
   isLoading: true,
   error: null,
+  session: null,
+  refreshSession: async () => null,
 };
 
 export const AuthContext = createContext<AuthState>(initialAuthState);

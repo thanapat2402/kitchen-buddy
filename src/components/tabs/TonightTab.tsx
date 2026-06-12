@@ -28,24 +28,53 @@ export function TonightTab({ showToast }: TonightTabProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isShuffling, setIsShuffling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestionError, setSuggestionError] = useState<string | null>(null);
 
   const loadAll = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    try {
-      const [items, recipes] = await Promise.all([repo.listPantryItems(), repo.getSuggestions()]);
-      setPantryItems(items);
-      setSuggestions(recipes);
-    } catch {
+    setSuggestionError(null);
+
+    // Pantry items and suggestions fail independently: a `suggest` outage
+    // (e.g. AI provider down) shouldn't blank the whole tab if the pantry
+    // list itself loaded fine — show the warning strip + a retry card
+    // in place of the suggestions instead.
+    const itemsResult = await repo.listPantryItems().catch(() => null);
+    if (itemsResult) {
+      setPantryItems(itemsResult);
+    } else {
       setError('โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง');
-    } finally {
-      setIsLoading(false);
     }
+
+    if (itemsResult) {
+      try {
+        const recipes = await repo.getSuggestions();
+        setSuggestions(recipes);
+      } catch {
+        setSuggestions([]);
+        setSuggestionError('ขอเมนูแนะนำไม่สำเร็จ ลองใหม่อีกครั้ง');
+      }
+    }
+
+    setIsLoading(false);
   }, [repo]);
 
   useEffect(() => {
     void loadAll();
   }, [loadAll]);
+
+  const loadSuggestions = useCallback(async () => {
+    setIsShuffling(true);
+    setSuggestionError(null);
+    try {
+      const recipes = await repo.getSuggestions();
+      setSuggestions(recipes);
+    } catch {
+      setSuggestionError('ขอเมนูแนะนำไม่สำเร็จ ลองใหม่อีกครั้ง');
+    } finally {
+      setIsShuffling(false);
+    }
+  }, [repo]);
 
   const nearExpiryItems = pantryItems
     .filter((item) => daysUntil(item.expiry_date) <= NEAR_EXPIRY_THRESHOLD_DAYS)
@@ -54,11 +83,13 @@ export function TonightTab({ showToast }: TonightTabProps) {
   async function handleShuffle() {
     setIsShuffling(true);
     setExpandedId(null);
+    setSuggestionError(null);
     try {
       const recipes = await repo.getSuggestions({ shuffle: true });
       setSuggestions(recipes);
     } catch {
-      showToast('ขอเมนูใหม่ไม่สำเร็จ ลองอีกครั้ง');
+      setSuggestions([]);
+      setSuggestionError('ขอเมนูแนะนำไม่สำเร็จ ลองใหม่อีกครั้ง');
     } finally {
       setIsShuffling(false);
     }
@@ -105,17 +136,21 @@ export function TonightTab({ showToast }: TonightTabProps) {
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">เมนูแนะนำคืนนี้</h2>
-        <button
-          type="button"
-          onClick={handleShuffle}
-          disabled={isShuffling}
-          className="rounded-full border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 active:scale-95 disabled:opacity-50"
-        >
-          {isShuffling ? 'กำลังหา...' : '🔄 ขอเมนูใหม่'}
-        </button>
+        {!suggestionError && (
+          <button
+            type="button"
+            onClick={handleShuffle}
+            disabled={isShuffling}
+            className="rounded-full border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 active:scale-95 disabled:opacity-50"
+          >
+            {isShuffling ? 'กำลังหา...' : '🔄 ขอเมนูใหม่'}
+          </button>
+        )}
       </div>
 
-      {suggestions.length === 0 ? (
+      {suggestionError ? (
+        <ErrorState message={suggestionError} onRetry={loadSuggestions} />
+      ) : suggestions.length === 0 ? (
         <p className="text-sm text-gray-500">ยังไม่มีเมนูแนะนำตอนนี้</p>
       ) : (
         <div className="flex flex-col gap-3">
