@@ -17,6 +17,15 @@ function base64UrlEncode(bytes: Uint8Array): string {
     .replace(/=+$/, "");
 }
 
+function base64UrlDecode(input: string): Uint8Array {
+  const padded = input.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = padded.length % 4 === 0 ? "" : "=".repeat(4 - (padded.length % 4));
+  const binary = atob(padded + padding);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
 function encodeJson(obj: unknown): string {
   return base64UrlEncode(new TextEncoder().encode(JSON.stringify(obj)));
 }
@@ -70,4 +79,68 @@ export async function signSupabaseJwt(
 
   const encodedSignature = base64UrlEncode(new Uint8Array(signature));
   return `${signingInput}.${encodedSignature}`;
+}
+
+/**
+ * Verify an HS256 Supabase-compatible access token minted by
+ * {@link signSupabaseJwt} (or by Supabase Auth itself, which also uses
+ * HS256 + the project JWT secret).
+ *
+ * Checks the header alg, the HMAC-SHA256 signature, and the `exp` claim.
+ * Returns the decoded claims on success, or `null` if the token is
+ * malformed, has a bad signature, or is expired. Never throws on untrusted
+ * input — callers should treat `null` as "401 Unauthorized".
+ *
+ * @param token   the raw `Authorization: Bearer <token>` value (no "Bearer " prefix)
+ * @param secret  the project's JWT secret (SB_JWT_SECRET)
+ */
+export async function verifySupabaseJwt(
+  token: string,
+  secret: string,
+): Promise<SupabaseJwtClaims | null> {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  const [encodedHeader, encodedPayload, encodedSignature] = parts;
+
+  let header: { alg?: string };
+  let payload: SupabaseJwtClaims & { exp?: number };
+  try {
+    header = JSON.parse(new TextDecoder().decode(base64UrlDecode(encodedHeader)));
+    payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(encodedPayload)));
+  } catch {
+    return null;
+  }
+
+  if (header.alg !== "HS256") return null;
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"],
+  );
+
+  let signatureValid: boolean;
+  try {
+    signatureValid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      base64UrlDecode(encodedSignature),
+      new TextEncoder().encode(`${encodedHeader}.${encodedPayload}`),
+    );
+  } catch {
+    return null;
+  }
+
+  if (!signatureValid) return null;
+
+  if (typeof payload.exp === "number") {
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp < now) return null;
+  }
+
+  if (!payload.sub || typeof payload.sub !== "string") return null;
+
+  return payload;
 }
