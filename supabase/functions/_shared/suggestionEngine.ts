@@ -4,7 +4,7 @@
 // the nightly precompute step in `daily-digest` (so morning app-opens hit
 // the ai_suggestions cache for free). Keeping this logic in one place avoids
 // the two call sites drifting apart (CLAUDE.md: pantry-hash cache + nightly
-// precompute, single Haiku-class call).
+// precompute, single low-cost LLM call).
 
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 
@@ -59,10 +59,9 @@ interface AiSuggestionRow {
 }
 
 const CACHE_FRESHNESS_MS = 24 * 60 * 60 * 1000; // 24h
-const MAX_TOKENS = 1500;
-const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_API_VERSION = "2023-06-01";
-const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+const MAX_TOKENS = 2048;
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+const DEFAULT_MODEL = "gemini-2.5-flash";
 
 // ---------------------------------------------------------------------------
 // Pantry loading + hashing
@@ -186,7 +185,7 @@ export async function getFreshCachedSuggestions(
 }
 
 // ---------------------------------------------------------------------------
-// Anthropic call
+// Gemini call
 // ---------------------------------------------------------------------------
 
 const SYSTEM_PROMPT = `คุณคือแม่ครัว/พ่อครัวประจำบ้านคนไทย หน้าที่ของคุณคือเสนอเมนูอาหาร 2-3
@@ -218,13 +217,12 @@ code fence รูปแบบ JSON ต้องเป็น:
   ]
 }`;
 
-interface AnthropicMessageContent {
-  type: string;
+interface GeminiPart {
   text?: string;
 }
 
-interface AnthropicResponse {
-  content?: AnthropicMessageContent[];
+interface GeminiResponse {
+  candidates?: { content?: { parts?: GeminiPart[] }; finishReason?: string }[];
   error?: { message?: string };
 }
 
@@ -270,48 +268,58 @@ function qtyLabel(qty: QtyState): string {
 }
 
 /**
- * Call the Anthropic Messages API once, parse the JSON response strictly.
+ * Call the Gemini generateContent API once, parse the JSON response strictly.
  * Throws on transport/HTTP errors; returns `null` if the response body is
  * not valid JSON matching the expected shape (caller decides whether to
  * retry).
+ *
+ * We force `responseMimeType: application/json` (so the model returns raw
+ * JSON, not prose or a markdown fence) and disable "thinking"
+ * (`thinkingBudget: 0`) — Gemini 2.5 Flash thinks by default, which burns the
+ * output-token budget on a task that needs none.
  */
-async function callAnthropic(
+async function callGemini(
   apiKey: string,
   model: string,
   userPrompt: string,
   correctionNote?: CorrectionNote,
 ): Promise<{ raw: string; parsed: LlmSuggestionsPayload | null }> {
-  const messages: { role: "user" | "assistant"; content: string }[] = [
-    { role: "user", content: userPrompt },
+  const contents: { role: "user" | "model"; parts: { text: string }[] }[] = [
+    { role: "user", parts: [{ text: userPrompt }] },
   ];
 
   if (correctionNote) {
-    messages.push({ role: "assistant", content: correctionNote.previousRaw });
-    messages.push({ role: "user", content: correctionNote.message });
+    contents.push({ role: "model", parts: [{ text: correctionNote.previousRaw }] });
+    contents.push({ role: "user", parts: [{ text: correctionNote.message }] });
   }
 
-  const resp = await fetch(ANTHROPIC_API_URL, {
+  const resp = await fetch(`${GEMINI_API_BASE}/${model}:generateContent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": ANTHROPIC_API_VERSION,
+      "x-goog-api-key": apiKey,
     },
     body: JSON.stringify({
-      model,
-      max_tokens: MAX_TOKENS,
-      system: SYSTEM_PROMPT,
-      messages,
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents,
+      generationConfig: {
+        responseMimeType: "application/json",
+        maxOutputTokens: MAX_TOKENS,
+        temperature: 0.7,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     }),
   });
 
   if (!resp.ok) {
     const errBody = await resp.text();
-    throw new Error(`Anthropic API ${resp.status}: ${errBody.slice(0, 500)}`);
+    throw new Error(`Gemini API ${resp.status}: ${errBody.slice(0, 500)}`);
   }
 
-  const json = (await resp.json()) as AnthropicResponse;
-  const text = json.content?.find((c) => c.type === "text")?.text ?? "";
+  const json = (await resp.json()) as GeminiResponse;
+  const text = json.candidates?.[0]?.content?.parts
+    ?.map((p) => p.text ?? "")
+    .join("") ?? "";
 
   return { raw: text, parsed: tryParseSuggestions(text) };
 }
@@ -357,28 +365,28 @@ function tryParseSuggestions(raw: string): LlmSuggestionsPayload | null {
   }
 }
 
-interface AnthropicConfig {
+interface LlmConfig {
   apiKey: string;
   model: string;
 }
 
 /**
- * One call to the Anthropic Messages API, with one corrective retry on
- * malformed JSON. Returns parsed suggestions, or throws if both attempts
- * fail (caller maps this to a 502).
+ * One call to the Gemini API, with one corrective retry on malformed JSON.
+ * Returns parsed suggestions, or throws if both attempts fail (caller maps
+ * this to a 502).
  */
 async function generateSuggestions(
-  config: AnthropicConfig,
+  config: LlmConfig,
   items: ActivePantryItem[],
 ): Promise<Suggestion[]> {
   const userPrompt = buildUserPrompt(items);
 
-  const first = await callAnthropic(config.apiKey, config.model, userPrompt);
+  const first = await callGemini(config.apiKey, config.model, userPrompt);
   if (first.parsed) return first.parsed.suggestions;
 
-  console.error("suggestionEngine: malformed JSON from Anthropic, retrying once", first.raw.slice(0, 300));
+  console.error("suggestionEngine: malformed JSON from Gemini, retrying once", first.raw.slice(0, 300));
 
-  const second = await callAnthropic(config.apiKey, config.model, userPrompt, {
+  const second = await callGemini(config.apiKey, config.model, userPrompt, {
     previousRaw: first.raw,
     message:
       "คำตอบก่อนหน้าไม่ใช่ JSON ที่ถูกต้องตาม schema กรุณาตอบกลับเป็น JSON ล้วนๆ ตาม schema ที่กำหนดเท่านั้น ห้ามมีข้อความอื่นหรือ markdown code fence",
@@ -386,7 +394,7 @@ async function generateSuggestions(
 
   if (second.parsed) return second.parsed.suggestions;
 
-  throw new Error("Anthropic returned malformed JSON twice");
+  throw new Error("Gemini returned malformed JSON twice");
 }
 
 // ---------------------------------------------------------------------------
@@ -412,7 +420,7 @@ export async function getOrGenerateSuggestions(
   admin: SupabaseClient,
   householdId: string,
   today: string,
-  options: { forceRefresh?: boolean; anthropic: AnthropicConfig | null },
+  options: { forceRefresh?: boolean; llm: LlmConfig | null },
 ): Promise<SuggestionResult> {
   const items = await loadActivePantryItems(admin, householdId, today);
 
@@ -427,8 +435,8 @@ export async function getOrGenerateSuggestions(
     if (cached) return cached;
   }
 
-  if (!options.anthropic) {
-    throw new SuggestionEngineError("Anthropic API not configured");
+  if (!options.llm) {
+    throw new SuggestionEngineError("LLM API not configured");
   }
 
   const usableItems = items.filter((item) => item.qty_state !== "out");
@@ -438,9 +446,9 @@ export async function getOrGenerateSuggestions(
 
   let suggestions: Suggestion[];
   try {
-    suggestions = await generateSuggestions(options.anthropic, items);
+    suggestions = await generateSuggestions(options.llm, items);
   } catch (err) {
-    throw new SuggestionEngineError("Failed to generate suggestions from Anthropic", err);
+    throw new SuggestionEngineError("Failed to generate suggestions from the LLM", err);
   }
 
   const generatedAt = new Date().toISOString();
@@ -452,7 +460,7 @@ export async function getOrGenerateSuggestions(
         household_id: householdId,
         pantry_hash: pantryHash,
         suggestions,
-        model: options.anthropic.model,
+        model: options.llm.model,
         generated_at: generatedAt,
       },
       { onConflict: "household_id,pantry_hash" },
@@ -468,13 +476,13 @@ export async function getOrGenerateSuggestions(
 }
 
 /**
- * Read Anthropic config from env. Returns null if not configured (e.g. local
- * dev without a key) so callers can degrade gracefully.
+ * Read LLM config from env. Returns null if not configured (e.g. local dev
+ * without a key) so callers can degrade gracefully.
  */
-export function getAnthropicConfig(): AnthropicConfig | null {
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+export function getLlmConfig(): LlmConfig | null {
+  const apiKey = Deno.env.get("GEMINI_API_KEY");
   if (!apiKey) return null;
-  const model = Deno.env.get("ANTHROPIC_MODEL") || DEFAULT_MODEL;
+  const model = Deno.env.get("GEMINI_MODEL") || DEFAULT_MODEL;
   return { apiKey, model };
 }
 

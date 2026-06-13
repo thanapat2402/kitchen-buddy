@@ -17,14 +17,14 @@
 //      supabase-js client built from the same JWT -- service-role is
 //      simpler here and this function already trusts its own JWT check).
 //   3. Load active pantry_items, compute pantry_hash, check ai_suggestions
-//      cache (fresh < 24h), else call Anthropic once (shared with the
+//      cache (fresh < 24h), else call Gemini once (shared with the
 //      nightly precompute in daily-digest via _shared/suggestionEngine.ts).
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders, handleOptions } from "../_shared/cors.ts";
 import { verifySupabaseJwt } from "../_shared/jwt.ts";
 import {
-  getAnthropicConfig,
+  getLlmConfig,
   getOrGenerateSuggestions,
   SuggestionEngineError,
   todayDateString,
@@ -114,7 +114,7 @@ Deno.serve(async (req: Request) => {
   try {
     const result = await getOrGenerateSuggestions(admin, householdId, todayDateString(), {
       forceRefresh,
-      anthropic: getAnthropicConfig(),
+      llm: getLlmConfig(),
     });
 
     return jsonResponse(result);

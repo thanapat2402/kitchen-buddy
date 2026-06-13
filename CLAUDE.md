@@ -1,12 +1,12 @@
 # Kitchen Buddy
 
-Personal-use LINE Mini App (LIFF): "คืนนี้ทำอะไรดี" — AI cook-tonight suggestions from the household pantry, prioritizing soonest-to-expire ingredients. Owner: Thanapat (solo dev, 6–10 hrs/week). **Goal: personal tool, not a business.** Budget ≈ $0/month at personal scale.
+Personal-use LINE Mini App (LIFF): "เย็นนี้กินอะไรดี" — AI dinner suggestions from the household pantry, prioritizing soonest-to-expire ingredients. Owner: Thanapat (solo dev, 6–10 hrs/week). **Goal: personal tool, not a business.** Budget ≈ $0/month at personal scale.
 
 ## Stack (decided by /cto board 2026-06-11 — do not relitigate without a new decision record)
 
 - **Frontend:** React + TypeScript + Vite + TailwindCSS, LIFF SDK (`@line/liff`). Must support a mock mode (fake LINE user) when `VITE_LIFF_ID` is unset so local dev needs no LINE account.
 - **Backend:** Supabase only — Postgres + RLS + Edge Functions + pg_cron. No separate server.
-- **AI:** single LLM call (Claude Haiku-class) per suggestion; pantry-hash cache + nightly precompute. NO RAG, NO embeddings, NO nutrition DB.
+- **AI:** single LLM call per suggestion; pantry-hash cache + nightly precompute. NO RAG, NO embeddings, NO nutrition DB. (Provider changed by owner 2026-06-13 from Claude Haiku to **Google Gemini** (`gemini-2.5-flash`) to use its free tier and hold the ฿0 budget — env `GEMINI_API_KEY` / optional `GEMINI_MODEL`. Engine is provider-isolated in `_shared/suggestionEngine.ts`; swapping back is one function.)
 - **Notifications:** LINE Messaging API push. ONE digest per user per day, sent only on days something is near expiry. Never per-item pushes. (LINE Notify is discontinued — do not use it.)
 - **Auth:** LINE Login via LIFF `id_token` → edge function verifies with LINE, maps line_user_id → stable user uuid, mints a Supabase-compatible JWT so `auth.uid()` and RLS enforce household isolation. Frontend talks to Postgres through supabase-js with that JWT.
 

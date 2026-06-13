@@ -17,7 +17,7 @@
 //      (shared via _shared/suggestionEngine.ts; it only ever considers
 //      *active* items when building the prompt). This warms the
 //      ai_suggestions cache so the next morning's app-open is a cache hit
-//      (cached:true, no LLM call). Skipped entirely if ANTHROPIC_API_KEY is
+//      (cached:true, no LLM call). Skipped entirely if GEMINI_API_KEY is
 //      not configured.
 //
 //   2. Digest: for each household with pantry items expiring within 3 days
@@ -38,7 +38,7 @@
 
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import {
-  getAnthropicConfig,
+  getLlmConfig,
   getOrGenerateSuggestions,
   SuggestionEngineError,
 } from "../_shared/suggestionEngine.ts";
@@ -145,7 +145,7 @@ Deno.serve(async (req: Request) => {
 
   // 3. Precompute: warm the ai_suggestions cache for households with
   // something expiring soon, so the next app-open is a cache hit. This is
-  // best-effort -- failures (incl. ANTHROPIC_API_KEY missing) are logged and
+  // best-effort -- failures (incl. GEMINI_API_KEY missing) are logged and
   // do not block the digest.
   const precompute = await precomputeSuggestions(admin, householdIds, todayStr);
 
@@ -283,7 +283,7 @@ Deno.serve(async (req: Request) => {
  * Warm the ai_suggestions cache for each household in `householdIds` using
  * the same get-or-generate logic as the `suggest` edge function. Best
  * effort: per-household failures are logged and counted but never thrown,
- * so a single bad household (or a missing ANTHROPIC_API_KEY) cannot break
+ * so a single bad household (or a missing GEMINI_API_KEY) cannot break
  * the expire sweep or digest send.
  */
 async function precomputeSuggestions(
@@ -291,11 +291,11 @@ async function precomputeSuggestions(
   householdIds: string[],
   todayStr: string,
 ): Promise<{ attempted: number; generated: number; cached: number; failed: number; skipped?: string }> {
-  const anthropic = getAnthropicConfig();
+  const llm = getLlmConfig();
 
-  if (!anthropic) {
-    console.error("daily-digest: ANTHROPIC_API_KEY not set, skipping precompute");
-    return { attempted: 0, generated: 0, cached: 0, failed: 0, skipped: "ANTHROPIC_API_KEY not set" };
+  if (!llm) {
+    console.error("daily-digest: GEMINI_API_KEY not set, skipping precompute");
+    return { attempted: 0, generated: 0, cached: 0, failed: 0, skipped: "GEMINI_API_KEY not set" };
   }
 
   let generated = 0;
@@ -306,7 +306,7 @@ async function precomputeSuggestions(
     try {
       const result = await getOrGenerateSuggestions(admin, householdId, todayStr, {
         forceRefresh: false,
-        anthropic,
+        llm,
       });
       if (result.cached) cached++;
       else generated++;

@@ -80,13 +80,13 @@ supabase secrets set \
   LINE_CHANNEL_ID=xxxxxxxxxxxx \
   LINE_MESSAGING_ACCESS_TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   SB_JWT_SECRET="your-jwt-secret-from-2.2" \
-  ANTHROPIC_API_KEY="sk-ant-..."
+  GEMINI_API_KEY="..."
 ```
 
-`ANTHROPIC_API_KEY` ใช้โดยฟีเจอร์ "คืนนี้ทำอะไรดี" (`suggest` + nightly precompute ใน
-`daily-digest`) — สร้าง key ได้ที่ console.anthropic.com ค่าใช้จ่ายที่ scale ใช้เอง:
-Haiku-class ~2–3K tokens/call + pantry-hash cache → ตกเดือนละไม่กี่บาท
-(ตั้ง `ANTHROPIC_MODEL` override ได้ ค่า default คือ `claude-haiku-4-5-20251001`)
+`GEMINI_API_KEY` ใช้โดยฟีเจอร์ "เย็นนี้กินอะไรดี" (`suggest` + nightly precompute ใน
+`daily-digest`) — สร้าง key ฟรีได้ที่ aistudio.google.com/apikey ใช้ free tier ของ
+Google Gemini จึงคุมงบ ฿0 ได้ (pantry-hash cache ทำให้ยิงจริงไม่กี่ครั้ง/วัน)
+(ตั้ง `GEMINI_MODEL` override ได้ ค่า default คือ `gemini-2.5-flash`)
 
 > **หมายเหตุสำคัญ**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
 > `SUPABASE_DB_URL` ถูก inject ให้ edge functions โดยอัตโนมัติ — **ห้าม** ตั้งเองด้วย
