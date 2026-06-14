@@ -2,6 +2,8 @@
 
 @theme {
   --font-sans: "Noto Sans Thai", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Playful rounded Thai display font for headings / brand / buttons. */
+  --font-display: "Mali", "Noto Sans Thai", cursive;
 
   /* Brand palette — from the pot-and-heart app mark. */
   --color-brand-terracotta: #e2725b;
@@ -29,7 +31,10 @@
 
   /* Warm cream page canvas (replaces the old near-white bg-gray-50). White
      cards sit on top of this for a cozy, on-brand look. */
-  --color-canvas: #fdf4e8;
+  --color-canvas: #fbf7ed;
+  /* Warm paper border (replaces cold gray-200) — gives the cards/chrome a
+     soft "paper" edge instead of a clinical gray line. */
+  --color-line: #e5dcc7;
 }
 
 html,
@@ -42,4 +47,36 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  /* Headings & the app wordmark wear the playful Mali display font. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  /* Chunky, tactile "pressable" button — the signature of the warm-playful
+     theme. A solid offset shadow gives a physical key look; pressing sinks
+     it. Pair with a bg-* and text color from Tailwind. */
+  .btn-pressable {
+    font-family: var(--font-display);
+    box-shadow: 0 4px 0 var(--color-primary-800);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .btn-pressable:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--color-primary-800);
+  }
+  /* Neutral variant for light/secondary buttons (cocoa-tinted edge). */
+  .btn-pressable-soft {
+    font-family: var(--font-display);
+    box-shadow: 0 4px 0 var(--color-line);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .btn-pressable-soft:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--color-line);
+  }
 }

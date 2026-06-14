@@ -94,7 +94,7 @@ export function PantryTab({ showToast }: PantryTabProps) {
         {sorted.map((item) => {
           const diff = daysUntil(item.expiry_date);
           const rowTone =
-            diff <= 1 ? 'border-red-200 bg-red-50' : diff <= 3 ? 'border-amber-200 bg-amber-50' : 'border-gray-200 bg-white';
+            diff <= 1 ? 'border-red-200 bg-red-50' : diff <= 3 ? 'border-amber-200 bg-amber-50' : 'border-line bg-white';
 
           return (
             <li key={item.id} className={`rounded-xl border p-3 ${rowTone}`}>
@@ -114,7 +114,7 @@ export function PantryTab({ showToast }: PantryTabProps) {
                   type="button"
                   onClick={() => handleConsumed(item)}
                   disabled={busyId === item.id}
-                  className="flex-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 active:scale-95 disabled:opacity-50"
+                  className="flex-1 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-medium text-gray-700 active:scale-95 disabled:opacity-50"
                 >
                   ใช้แล้ว
                 </button>
@@ -122,7 +122,7 @@ export function PantryTab({ showToast }: PantryTabProps) {
                   type="button"
                   onClick={() => handleDiscarded(item)}
                   disabled={busyId === item.id}
-                  className="flex-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 active:scale-95 disabled:opacity-50"
+                  className="flex-1 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-medium text-gray-700 active:scale-95 disabled:opacity-50"
                 >
                   ทิ้งแล้ว
                 </button>

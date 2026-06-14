@@ -142,7 +142,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
                 type="button"
                 onClick={() => handleQuickPick(catalogItem)}
                 disabled={pendingId === catalogItem.id}
-                className="relative flex flex-col items-center gap-1 rounded-xl border border-gray-200 bg-white p-2 text-center active:scale-95 disabled:opacity-60"
+                className="relative flex flex-col items-center gap-1 rounded-xl border border-line bg-white p-2 text-center active:scale-95 disabled:opacity-60"
               >
                 {tapCount > 0 && (
                   <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
@@ -161,7 +161,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
 
       <section>
         <h3 className="mb-2 text-sm font-semibold text-gray-700">เพิ่มแบบพิมพ์เอง</h3>
-        <form onSubmit={handleFreeTextSubmit} className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3">
+        <form onSubmit={handleFreeTextSubmit} className="flex flex-col gap-2 rounded-xl border border-line bg-white p-3">
           <label className="flex flex-col gap-1">
             <span className="text-xs font-medium text-gray-500">ชื่อของ</span>
             <input
@@ -169,7 +169,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
               value={freeTextName}
               onChange={(e) => setFreeTextName(e.target.value)}
               placeholder="เช่น แกงเขียวหวานเหลือ"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="rounded-lg border border-line px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </label>
           <label className="flex flex-col gap-1">
@@ -179,13 +179,13 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
               value={freeTextDate}
               min={todayIso()}
               onChange={(e) => setFreeTextDate(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="rounded-lg border border-line px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </label>
           <button
             type="submit"
             disabled={!freeTextName.trim() || isAddingFreeText}
-            className="rounded-full bg-primary-600 px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+            className="rounded-full bg-primary-600 px-3 py-2 text-sm font-bold text-white btn-pressable disabled:opacity-50"
           >
             {isAddingFreeText ? 'กำลังเพิ่ม...' : '+ เพิ่มของ'}
           </button>
@@ -201,7 +201,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
             {recent.map((entry) => (
               <li
                 key={entry.item.id}
-                className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-2.5"
+                className="flex items-center gap-3 rounded-xl border border-line bg-white p-2.5"
               >
                 <span className="text-xl" aria-hidden="true">
                   {entry.item.icon}
@@ -216,7 +216,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
                 <button
                   type="button"
                   onClick={() => handleUndo(entry.item)}
-                  className="shrink-0 rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 active:scale-95"
+                  className="shrink-0 rounded-full border border-line px-3 py-1 text-xs font-medium text-gray-600 active:scale-95"
                 >
                   เลิกทำ
                 </button>

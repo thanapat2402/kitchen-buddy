@@ -38,7 +38,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-canvas pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas pb-[env(safe-area-inset-bottom)]"
       aria-label="เมนูหลัก"
     >
       <div className="mx-auto flex max-w-md">

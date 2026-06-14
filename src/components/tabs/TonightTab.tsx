@@ -142,7 +142,7 @@ export function TonightTab({ showToast }: TonightTabProps) {
             type="button"
             onClick={handleShuffle}
             disabled={isShuffling}
-            className="rounded-full border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 active:scale-95 disabled:opacity-50"
+            className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-gray-700 active:scale-95 disabled:opacity-50"
           >
             {isShuffling ? 'กำลังหา...' : '🔄 ขอเมนูใหม่'}
           </button>
@@ -187,7 +187,7 @@ function RecipeCard({ recipe, highlighted, expanded, cooking, onToggleSteps, onM
   return (
     <article
       className={`rounded-2xl border p-4 shadow-sm transition ${
-        highlighted ? 'border-primary-300 bg-primary-50' : 'border-gray-200 bg-white'
+        highlighted ? 'border-primary-300 bg-primary-50' : 'border-line bg-white'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -235,7 +235,7 @@ function RecipeCard({ recipe, highlighted, expanded, cooking, onToggleSteps, onM
         <button
           type="button"
           onClick={onToggleSteps}
-          className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 active:scale-95"
+          className="flex-1 rounded-full border border-line bg-white px-3 py-2 text-sm font-medium text-gray-700 btn-pressable-soft"
         >
           {expanded ? 'ซ่อนวิธีทำ' : 'ดูวิธีทำ'}
         </button>
@@ -243,7 +243,7 @@ function RecipeCard({ recipe, highlighted, expanded, cooking, onToggleSteps, onM
           type="button"
           onClick={onMarkCooked}
           disabled={cooking}
-          className="flex-1 rounded-full bg-primary-600 px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+          className="flex-1 rounded-full bg-primary-600 px-3 py-2 text-sm font-bold text-white btn-pressable disabled:opacity-50"
         >
           {cooking ? 'กำลังบันทึก...' : 'ทำแล้ว ✓'}
         </button>
