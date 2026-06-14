@@ -17,7 +17,7 @@ function AppShell() {
 
   if (isLoading) {
     return (
-      <div className="flex h-dvh items-center justify-center bg-gray-50">
+      <div className="flex h-dvh items-center justify-center bg-canvas">
         <p className="text-sm text-gray-500">กำลังโหลด...</p>
       </div>
     );
@@ -25,7 +25,7 @@ function AppShell() {
 
   if (error) {
     return (
-      <div className="flex h-dvh items-center justify-center bg-gray-50 px-6 text-center">
+      <div className="flex h-dvh items-center justify-center bg-canvas px-6 text-center">
         <div>
           <p className="text-base font-semibold text-red-600">เข้าสู่ระบบไม่สำเร็จ</p>
           <p className="mt-1 text-sm text-gray-500">{error}</p>
@@ -40,7 +40,7 @@ function AppShell() {
   // falling back to mock data, which would hide a real auth problem.
   if (!isMock && hasSupabaseConfig && !session) {
     return (
-      <div className="flex h-dvh items-center justify-center bg-gray-50 px-6 text-center">
+      <div className="flex h-dvh items-center justify-center bg-canvas px-6 text-center">
         <div>
           <p className="text-base font-semibold text-red-600">เชื่อมต่อระบบไม่สำเร็จ</p>
           <p className="mt-1 text-sm text-gray-500">ลองปิดแล้วเปิดแอปใหม่อีกครั้ง</p>
@@ -51,8 +51,8 @@ function AppShell() {
 
   return (
     <RepoProvider>
-      <div className="mx-auto flex h-dvh max-w-md flex-col bg-gray-50">
-        <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+      <div className="mx-auto flex h-dvh max-w-md flex-col bg-canvas">
+        <header className="flex items-center justify-between border-b border-gray-200 bg-canvas px-4 py-3">
           <div className="flex items-center gap-2.5">
             <img src="/icons/icon-pot-sparkle.svg" alt="" className="h-8 w-8 rounded-[9px]" />
             <div>

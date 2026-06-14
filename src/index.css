@@ -26,6 +26,10 @@
   --color-primary-700: #a3472f;
   --color-primary-800: #7d3623;
   --color-primary-900: #5c4033;
+
+  /* Warm cream page canvas (replaces the old near-white bg-gray-50). White
+     cards sit on top of this for a cozy, on-brand look. */
+  --color-canvas: #fdf4e8;
 }
 
 html,
