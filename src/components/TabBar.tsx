@@ -51,7 +51,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
               onClick={() => onChange(tab.key)}
               aria-current={isActive ? 'page' : undefined}
               className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition-colors ${
-                isActive ? 'text-emerald-600' : 'text-gray-400'
+                isActive ? 'text-primary-600' : 'text-gray-400'
               }`}
             >
               <span className="text-xl" aria-hidden="true">

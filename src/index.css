@@ -3,9 +3,7 @@
 @theme {
   --font-sans: "Noto Sans Thai", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  /* Brand palette — from the pot-and-heart app mark (design-system
-     tokens/colors.css). For brand/splash/marketing moments; functional
-     UI stays on Tailwind emerald/amber/red/gray. */
+  /* Brand palette — from the pot-and-heart app mark. */
   --color-brand-terracotta: #e2725b;
   --color-brand-terracotta-deep: #c95b3f;
   --color-brand-blush: #f0a48a;
@@ -13,6 +11,21 @@
   --color-brand-cocoa: #5c4033;
   --color-brand-cream: #ffefdd;
   --color-brand-sage: #edf0e3;
+
+  /* Primary = the terracotta brand color, as a full Tailwind scale so
+     bg-primary-600 / text-primary-600 / border-primary-300 / ring-primary-500
+     all work. This is THE app theme accent (was emerald). Urgency stays
+     semantic: red = expiring, amber = soon, green = fresh/มี. */
+  --color-primary-50: #fdf2ef;
+  --color-primary-100: #f9dad0;
+  --color-primary-200: #f2b6a4;
+  --color-primary-300: #ea9279;
+  --color-primary-400: #e57e64;
+  --color-primary-500: #e2725b;
+  --color-primary-600: #c95b3f;
+  --color-primary-700: #a3472f;
+  --color-primary-800: #7d3623;
+  --color-primary-900: #5c4033;
 }
 
 html,

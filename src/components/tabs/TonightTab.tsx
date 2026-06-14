@@ -187,7 +187,7 @@ function RecipeCard({ recipe, highlighted, expanded, cooking, onToggleSteps, onM
   return (
     <article
       className={`rounded-2xl border p-4 shadow-sm transition ${
-        highlighted ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white'
+        highlighted ? 'border-primary-300 bg-primary-50' : 'border-gray-200 bg-white'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -196,7 +196,7 @@ function RecipeCard({ recipe, highlighted, expanded, cooking, onToggleSteps, onM
           <p className="mt-0.5 text-xs text-gray-500">⏱️ {recipe.time_minutes} นาที</p>
         </div>
         {highlighted && (
-          <span className="shrink-0 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white">
+          <span className="shrink-0 rounded-full bg-primary-600 px-2 py-1 text-[10px] font-bold text-white">
             แนะนำ
           </span>
         )}
@@ -243,7 +243,7 @@ function RecipeCard({ recipe, highlighted, expanded, cooking, onToggleSteps, onM
           type="button"
           onClick={onMarkCooked}
           disabled={cooking}
-          className="flex-1 rounded-full bg-emerald-600 px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+          className="flex-1 rounded-full bg-primary-600 px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
         >
           {cooking ? 'กำลังบันทึก...' : 'ทำแล้ว ✓'}
         </button>

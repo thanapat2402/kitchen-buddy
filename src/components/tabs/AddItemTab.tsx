@@ -145,7 +145,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
                 className="relative flex flex-col items-center gap-1 rounded-xl border border-gray-200 bg-white p-2 text-center active:scale-95 disabled:opacity-60"
               >
                 {tapCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
                     +{tapCount}
                   </span>
                 )}
@@ -169,7 +169,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
               value={freeTextName}
               onChange={(e) => setFreeTextName(e.target.value)}
               placeholder="เช่น แกงเขียวหวานเหลือ"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </label>
           <label className="flex flex-col gap-1">
@@ -179,13 +179,13 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
               value={freeTextDate}
               min={todayIso()}
               onChange={(e) => setFreeTextDate(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </label>
           <button
             type="submit"
             disabled={!freeTextName.trim() || isAddingFreeText}
-            className="rounded-full bg-emerald-600 px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+            className="rounded-full bg-primary-600 px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
           >
             {isAddingFreeText ? 'กำลังเพิ่ม...' : '+ เพิ่มของ'}
           </button>
@@ -209,7 +209,7 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-gray-900">
                     {entry.item.name_th}
-                    {entry.tapCount > 1 && <span className="ml-1 text-xs text-emerald-600">×{entry.tapCount}</span>}
+                    {entry.tapCount > 1 && <span className="ml-1 text-xs text-primary-600">×{entry.tapCount}</span>}
                   </p>
                   <p className="text-xs text-gray-500">หมดอายุ {formatThaiShortDate(entry.item.expiry_date)}</p>
                 </div>

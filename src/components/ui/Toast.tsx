@@ -38,7 +38,7 @@ export function Toast({ toast, onDismiss, duration = 3500 }: ToastProps) {
             toast.onAction?.();
             onDismiss(toast.id);
           }}
-          className="font-semibold text-emerald-300 active:opacity-70"
+          className="font-semibold text-primary-300 active:opacity-70"
         >
           {toast.actionLabel}
         </button>
