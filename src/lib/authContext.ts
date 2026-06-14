@@ -1,7 +1,9 @@
 import { createContext } from 'react';
 import type { AuthState } from '../types/auth';
 
-export const MOCK_USER_DISPLAY_NAME = 'คุณกอล์ฟ';
+// Bare nickname — the header greeting composes "สวัสดี คุณ{displayName}",
+// matching real LINE display names which carry no honorific.
+export const MOCK_USER_DISPLAY_NAME = 'กอล์ฟ';
 
 export const initialAuthState: AuthState = {
   user: null,

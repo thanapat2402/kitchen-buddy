@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
-  <g transform="translate(-40,-50)">
-    <rect x="40" y="50" width="180" height="180" rx="42" fill="#FFEFDD"/>
-    <path d="M130 106 C 121 99, 117 92, 121 87 C 124 82.5, 129.5 84.5, 130 89 C 130.5 84.5, 136 82.5, 139 87 C 143 92, 139 99, 130 106 Z" fill="#F0A48A"/>
-    <rect x="72" y="150" width="16" height="9" rx="4.5" fill="#C95B3F"/>
-    <rect x="172" y="150" width="16" height="9" rx="4.5" fill="#C95B3F"/>
-    <path d="M88 143 Q130 114 172 143 Z" fill="#C95B3F"/>
-    <circle cx="130" cy="122" r="5.5" fill="#5C4033"/>
-    <rect x="86" y="142" width="88" height="50" rx="15" fill="#E2725B"/>
-    <rect x="86" y="142" width="88" height="7" fill="#C95B3F"/>
+  <g transform="translate(-250,-50)">
+    <rect x="250" y="50" width="180" height="180" rx="42" fill="#EDF0E3"/>
+    <path d="M336 80 Q339 91 350 94 Q339 97 336 108 Q333 97 322 94 Q333 91 336 80 Z" fill="#E8A23D"/>
+    <path d="M362 72 Q363.5 77.5 369 79 Q363.5 80.5 362 86 Q360.5 80.5 355 79 Q360.5 77.5 362 72 Z" fill="#E8A23D"/>
+    <rect x="282" y="150" width="16" height="9" rx="4.5" fill="#544134"/>
+    <rect x="382" y="150" width="16" height="9" rx="4.5" fill="#544134"/>
+    <path d="M298 143 Q340 114 382 143 Z" fill="#544134"/>
+    <circle cx="340" cy="122" r="5.5" fill="#E2725B"/>
+    <rect x="296" y="142" width="88" height="50" rx="15" fill="#6B5444"/>
+    <rect x="296" y="142" width="88" height="7" fill="#544134"/>
   </g>
 </svg>

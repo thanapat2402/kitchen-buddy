@@ -2,6 +2,17 @@
 
 @theme {
   --font-sans: "Noto Sans Thai", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Brand palette — from the pot-and-heart app mark (design-system
+     tokens/colors.css). For brand/splash/marketing moments; functional
+     UI stays on Tailwind emerald/amber/red/gray. */
+  --color-brand-terracotta: #e2725b;
+  --color-brand-terracotta-deep: #c95b3f;
+  --color-brand-blush: #f0a48a;
+  --color-brand-yolk: #f2b450;
+  --color-brand-cocoa: #5c4033;
+  --color-brand-cream: #ffefdd;
+  --color-brand-sage: #edf0e3;
 }
 
 html,

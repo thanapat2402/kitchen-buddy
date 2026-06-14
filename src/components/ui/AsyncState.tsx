@@ -25,7 +25,7 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white active:opacity-80"
+          className="rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white transition active:scale-95"
         >
           ลองอีกครั้ง
         </button>

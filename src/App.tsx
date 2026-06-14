@@ -53,9 +53,12 @@ function AppShell() {
     <RepoProvider>
       <div className="mx-auto flex h-dvh max-w-md flex-col bg-gray-50">
         <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-          <div>
-            <h1 className="text-base font-bold text-gray-900">Kitchen Buddy</h1>
-            <p className="text-xs text-gray-500">สวัสดี {user?.displayName ?? 'คุณ'}</p>
+          <div className="flex items-center gap-2.5">
+            <img src="/icons/icon-pot-sparkle.svg" alt="" className="h-8 w-8 rounded-[9px]" />
+            <div>
+              <h1 className="text-base font-bold text-gray-900">Kitchen Buddy</h1>
+              <p className="text-xs text-gray-500">สวัสดี {user?.displayName ? `คุณ${user.displayName}` : 'คุณ'}</p>
+            </div>
           </div>
           {isMock && (
             <span className="rounded-full bg-violet-100 px-2 py-1 text-[10px] font-semibold text-violet-700">

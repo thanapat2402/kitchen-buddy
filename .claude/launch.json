@@ -4,8 +4,8 @@
     {
       "name": "kitchen-buddy-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 5173,
+      "runtimeArgs": ["run", "dev", "--", "--port", "5174", "--strictPort"],
+      "port": 5174,
       "cwd": "/Users/tnp.24/work/Golf/kitchen-buddy"
     }
   ]

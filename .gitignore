@@ -22,3 +22,4 @@ supabase/.branches/
 logs
 *.log
 npm-debug.log*
+.vercel

@@ -53,3 +53,17 @@ export function formatThaiShortDate(isoDate: string): string {
   const d = new Date(`${isoDate}T00:00:00`);
   return new Intl.DateTimeFormat('th-TH', { day: 'numeric', month: 'short' }).format(d);
 }
+
+/**
+ * Thai meal-period word for the current time of day, used to make the
+ * "เมนู…" tab + heading shift with when the user opens the app:
+ *   04:00–10:59 → "เช้านี้"  (breakfast)
+ *   11:00–15:59 → "เที่ยงนี้" (lunch)
+ *   16:00–03:59 → "เย็นนี้"  (dinner)
+ */
+export function mealPeriodTh(now: Date = new Date()): string {
+  const h = now.getHours();
+  if (h >= 4 && h < 11) return 'เช้านี้';
+  if (h >= 11 && h < 16) return 'เที่ยงนี้';
+  return 'เย็นนี้';
+}

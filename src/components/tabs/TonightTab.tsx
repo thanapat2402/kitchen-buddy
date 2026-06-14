@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRepo } from '../../hooks/useRepo';
-import { daysUntil, expiryLabelTh } from '../../lib/date';
+import { daysUntil, expiryLabelTh, mealPeriodTh } from '../../lib/date';
 import type { PantryItem, RecipeSuggestion } from '../../types/pantry';
 import { ErrorState, LoadingState } from '../ui/AsyncState';
 
@@ -11,7 +11,8 @@ interface TonightTabProps {
 const NEAR_EXPIRY_THRESHOLD_DAYS = 1;
 
 /**
- * Tab 1 (default): "เมนูคืนนี้".
+ * Tab 1 (default): "เมนู{ช่วงเวลา}" — the meal-period label shifts with
+ * the time of day (เช้านี้ / เที่ยงนี้ / เย็นนี้), see `mealPeriodTh`.
  *
  * - Warning strip lists items expiring today/tomorrow.
  * - 2-3 suggestion cards, first one highlighted, each can expand its
@@ -135,7 +136,7 @@ export function TonightTab({ showToast }: TonightTabProps) {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">เมนูแนะนำคืนนี้</h2>
+        <h2 className="text-lg font-bold text-gray-900">เมนูแนะนำ{mealPeriodTh()}</h2>
         {!suggestionError && (
           <button
             type="button"
