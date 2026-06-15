@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRepo } from '../../hooks/useRepo';
 import { addDaysIso, formatThaiShortDate, todayIso } from '../../lib/date';
 import type { CatalogItem, PantryItem } from '../../types/pantry';
+import { CATEGORY_LABEL_TH, CATEGORY_ORDER } from '../../lib/categoryMap';
 import { EmptyState, ErrorState, LoadingState } from '../ui/AsyncState';
 
 interface AddItemTabProps {
@@ -124,6 +125,36 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
   if (isLoading) return <LoadingState message="กำลังโหลดรายการ..." />;
   if (error) return <ErrorState message={error} onRetry={load} />;
 
+  // Group the quick-pick catalog by category, in display order, dropping
+  // empty groups so the picker only shows categories that have items.
+  const grouped = CATEGORY_ORDER.map((category) => ({
+    category,
+    items: catalog.filter((c) => c.category === category),
+  })).filter((g) => g.items.length > 0);
+
+  function renderChip(catalogItem: CatalogItem) {
+    const tapCount = recent.find((e) => e.item.catalog_item_id === catalogItem.id)?.tapCount ?? 0;
+    return (
+      <button
+        key={catalogItem.id}
+        type="button"
+        onClick={() => handleQuickPick(catalogItem)}
+        disabled={pendingId === catalogItem.id}
+        className="relative flex flex-col items-center gap-1 rounded-xl border border-line bg-white p-2 text-center active:scale-95 disabled:opacity-60"
+      >
+        {tapCount > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
+            +{tapCount}
+          </span>
+        )}
+        <span className="text-2xl" aria-hidden="true">
+          {catalogItem.icon}
+        </span>
+        <span className="text-[11px] leading-tight text-gray-700">{catalogItem.name_th}</span>
+      </button>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5 p-4">
       <div>
@@ -131,32 +162,14 @@ export function AddItemTab({ showToast }: AddItemTabProps) {
         <p className="text-xs text-gray-500">แตะเพื่อเพิ่ม ระบบตั้งวันหมดอายุให้อัตโนมัติ</p>
       </div>
 
-      <section>
-        <h3 className="mb-2 text-sm font-semibold text-gray-700">หยิบเร็ว</h3>
-        <div className="grid grid-cols-4 gap-2">
-          {catalog.map((catalogItem) => {
-            const tapCount = recent.find((e) => e.item.catalog_item_id === catalogItem.id)?.tapCount ?? 0;
-            return (
-              <button
-                key={catalogItem.id}
-                type="button"
-                onClick={() => handleQuickPick(catalogItem)}
-                disabled={pendingId === catalogItem.id}
-                className="relative flex flex-col items-center gap-1 rounded-xl border border-line bg-white p-2 text-center active:scale-95 disabled:opacity-60"
-              >
-                {tapCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
-                    +{tapCount}
-                  </span>
-                )}
-                <span className="text-2xl" aria-hidden="true">
-                  {catalogItem.icon}
-                </span>
-                <span className="text-[11px] leading-tight text-gray-700">{catalogItem.name_th}</span>
-              </button>
-            );
-          })}
-        </div>
+      <section className="flex flex-col gap-4">
+        <h3 className="text-sm font-semibold text-gray-700">หยิบเร็ว</h3>
+        {grouped.map(({ category, items }) => (
+          <div key={category}>
+            <p className="mb-2 text-xs font-semibold text-primary-700">{CATEGORY_LABEL_TH[category]}</p>
+            <div className="grid grid-cols-4 gap-2">{items.map(renderChip)}</div>
+          </div>
+        ))}
       </section>
 
       <section>

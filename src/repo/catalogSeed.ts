@@ -1,11 +1,16 @@
 import type { CatalogItem } from '../types/pantry';
+import { iconForName } from '../lib/categoryMap';
 
 /**
  * Curated Thai-staples quick-pick catalog (~30 items).
  * `default_shelf_life_days` is a rough household estimate — good enough
  * to remove manual date entry for the common case (CLAUDE.md rule #1).
+ *
+ * Icons below are placeholders; the exported {@link CATALOG_SEED} overrides
+ * each one via `iconForName` so mock and the real Supabase repo resolve icons
+ * through the exact same per-ingredient map.
  */
-export const CATALOG_SEED: CatalogItem[] = [
+const CATALOG_SEED_RAW: CatalogItem[] = [
   // Vegetables
   { id: 'cat-egg', name_th: 'ไข่ไก่', category: 'egg_dairy', default_shelf_life_days: 21, icon: '🥚', is_seed: true },
   { id: 'cat-cabbage', name_th: 'กะหล่ำปลี', category: 'vegetable', default_shelf_life_days: 10, icon: '🥬', is_seed: true },
@@ -51,3 +56,8 @@ export const CATALOG_SEED: CatalogItem[] = [
   // Frozen
   { id: 'cat-dumpling', name_th: 'เกี๊ยวซ่า', category: 'frozen', default_shelf_life_days: 60, icon: '🥟', is_seed: true },
 ];
+
+export const CATALOG_SEED: CatalogItem[] = CATALOG_SEED_RAW.map((item) => ({
+  ...item,
+  icon: iconForName(item.name_th, item.category),
+}));

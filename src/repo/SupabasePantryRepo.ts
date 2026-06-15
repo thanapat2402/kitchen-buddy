@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createAuthedClient } from '../lib/supabaseClient';
 import { addDaysIso, todayIso } from '../lib/date';
-import { FREE_TEXT_CATEGORY, FREE_TEXT_ICON, iconForCategory, mapDbCategory } from '../lib/categoryMap';
+import { FREE_TEXT_CATEGORY, FREE_TEXT_ICON, iconForName, mapDbCategory } from '../lib/categoryMap';
 import type {
   AddItemResult,
   CatalogItem,
@@ -406,7 +406,7 @@ function mapCatalogItemRow(row: CatalogItemRow): CatalogItem {
     name_th: row.name_th,
     category,
     default_shelf_life_days: row.default_shelf_life_days,
-    icon: iconForCategory(category),
+    icon: iconForName(row.name_th, category),
     is_seed: true,
   };
 }
@@ -423,7 +423,7 @@ function mapPantryItemRow(row: PantryItemRow): PantryItem {
     free_text_name: row.free_text_name,
     name_th: name,
     category,
-    icon: catalog ? iconForCategory(category) : FREE_TEXT_ICON,
+    icon: catalog ? iconForName(name, category) : FREE_TEXT_ICON,
     qty_state: row.qty_state,
     expiry_date: row.expiry_date ?? todayIso(),
     status: row.status,
